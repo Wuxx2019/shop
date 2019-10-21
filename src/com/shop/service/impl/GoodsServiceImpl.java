@@ -43,9 +43,9 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public boolean getGoodsById(GoodsInfo goods) {
+    public GoodsInfo getGoodsById(int id) {
         GoodsDao goodsDao = new GoodsDaoImpl();
-        return goodsDao.getGoodsById(goods);
+        return goodsDao.getGoodsById(id);
     }
 
     @Override

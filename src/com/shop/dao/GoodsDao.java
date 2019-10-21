@@ -45,10 +45,10 @@ public interface GoodsDao {
 
     /**
      * 根据Id查找商品信息
-     * @param goods 商品信息
+     * @param i 商品信息
      * @return boolean
      */
-    boolean getGoodsById(GoodsInfo goods);
+    GoodsInfo getGoodsById(int i);
 
     /**
      *

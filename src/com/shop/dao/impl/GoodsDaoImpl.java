@@ -6,13 +6,9 @@ import com.shop.dao.GoodsDao;
 import com.shop.dao.GoodsTypeDao;
 import com.shop.entity.GoodsInfo;
 import com.shop.entity.GoodsTypeInfo;
-import com.shop.entity.UserInfo;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @ProjectName：shop
@@ -33,7 +29,7 @@ public class GoodsDaoImpl extends BaseDao implements GoodsDao {
         StringBuffer sql = new StringBuffer();
         sql.append("select ");
         sql.append("id , goodsname ,goodsprice ,goodsimageurl, goodstime, goodsstate ,goodsInfo,  goodstype, num");
-        sql.append("from t_goods ");
+        sql.append(" from t_goods ");
         //设置查询条件
         commonSqlParams(sql, params);
         //分页查询一定在条件的后边
@@ -59,7 +55,9 @@ public class GoodsDaoImpl extends BaseDao implements GoodsDao {
                 goods.setGoodsstate(resultSet.getInt("goodsstate"));
                 goods.setGoodsInfo(resultSet.getString("GoodsInfo"));
                 List<GoodsTypeInfo> goodsTypeInfoList = goodsTypeDao.getGoodsTypeList(param);
-                goods.setGoodsType(goodsTypeInfoList.get(0));
+                if(goodsTypeInfoList != null && goodsTypeInfoList.size() == 1){
+                    goods.setGoodsType(goodsTypeInfoList.get(0));
+                }
                 goods.setNum(resultSet.getInt("num"));
                 //将结果集对象放入结果集列表
                 goodss.add(goods);
@@ -221,6 +219,9 @@ public class GoodsDaoImpl extends BaseDao implements GoodsDao {
         if(params.containsKey("goodstype") && !"".equals(params.get("goodstype"))){
             sql.append(" and goodstype = '").append(params.get("goodstype")).append("'");
         }
+        if(params.containsKey("id") && !"".equals(params.get("id"))){
+            sql.append(" and id = '").append(params.get("id")).append("'");
+        }
 
 
         return sql;
@@ -238,50 +239,37 @@ public class GoodsDaoImpl extends BaseDao implements GoodsDao {
     }
 
     @Override
-    public boolean getGoodsById(GoodsInfo goods) {
-        connection= ConnectionFactory.getConnection();
-        StringBuffer sql = new StringBuffer();
-        sql.append("select   goodsname = ?,goodsprice = ?,goodsimageurl = ?,goodstime = ?,goodsstate = ?, ");
-        sql.append("goodsInfo = ?,goodstype = ?  from  t_goods ");
-        sql.append("where id = ?");
+    public GoodsInfo getGoodsById(int id) {
         try {
-            System.out.println("查询的sql语句：" + sql);
-            preparedStatement = connection.prepareStatement(sql.toString());
-            resultSet = preparedStatement.executeQuery();
-            //遍历所有的行
-            while (resultSet.next()) {
-                //创建user对象
-                GoodsInfo goodsInfo = new GoodsInfo();
-                Map<String,Object> param = new HashMap<>();
-                param.put("id",resultSet.getString("goodstype"));
-                //将每一行的数据放入user对象中
-                //id为表格字段名称
-                goodsInfo.setId(resultSet.getInt("id"));
-                goodsInfo.setGoodsname(resultSet.getString("goodsname"));
-                goodsInfo.setGoodsprice(resultSet.getDouble("goodsprice"));
-                goodsInfo.setGoodsimageurl(resultSet.getString("goodsimageurl"));
-                goodsInfo.setGoodstime(resultSet.getDate("goodstime"));
-                goodsInfo.setGoodsstate(resultSet.getInt("goodsstate"));
-                goodsInfo.setGoodsInfo(resultSet.getString("goodsInfo"));
-                goodsInfo.setNum(resultSet.getInt("num"));
-                System.out.println("查询的结果：" + goodsInfo.toString());
-                int ret=preparedStatement.executeUpdate();
-                if(ret>0){
-                    System.out.println("查询成功！");
-                    return true;
-                }else
-                {
-                    System.out.println("查询失败！");
-                }
+            connection= ConnectionFactory.getConnection();
+            StringBuffer sql = new StringBuffer();
+            sql.append("select * from t_goods where goodsstate = 1 and id = ? ");
+            System.out.println("查询的sql语句："+sql);
+            preparedStatement=connection.prepareStatement(sql.toString());
+            preparedStatement.setObject(1,id);
+            resultSet=preparedStatement.executeQuery();
+            while(resultSet.next()){
+                String goodsname = resultSet.getString("goodsname");
+                double goodsprice = resultSet.getDouble("goodsprice");
+                String goodsimageurl = resultSet.getString("goodsimageurl");
+                Date goodstime = resultSet.getDate("goodsctime");
+                int goodsstate = resultSet.getInt("goodsstate");
+                String goodsInfo = resultSet.getString("goodsInfo");
+                int goodstype = resultSet.getInt("goodstype");
+                int num = resultSet.getInt("num");
+                //通过查询到的goodstype 查询整个goodstype对象
+                GoodsTypeInfo goodsType = new GoodsTypeInfo();
+                goodsType.setId(goodstype);
+                GoodsInfo goods = new GoodsInfo(id,goodsname,goodsprice,goodsimageurl,goodstime,goodsstate,goodsInfo,num,goodsType);
+                return goods;
             }
-        }catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }finally{
             ConnectionFactory.closeAllConnection(connection, preparedStatement, resultSet);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return false;
+        return null;
     }
+}
 // sql测试
  /*   public static void main(String[] args) {
         GoodsDao GoodsDao = new GoodsDaoImpl();
@@ -301,4 +289,3 @@ public class GoodsDaoImpl extends BaseDao implements GoodsDao {
         System.out.println("a="+a.toString());
     }*/
 
-}

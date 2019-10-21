@@ -47,7 +47,7 @@ public interface GoodsService {
      * 根据Id查询某个商品
      * @return
      */
-    boolean getGoodsById(GoodsInfo goods);
+    GoodsInfo getGoodsById(int id);
     
 
     /**

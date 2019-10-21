@@ -28,16 +28,16 @@
 
     <!-- 拦截器 -->
     <filter>
-        <filter-name>LoginFilter</filter-name>
+        <filter-name>loginFilter</filter-name>
         <filter-class>com.shop.common.LoginFilter</filter-class>
     </filter>
     <!-- 拦截以*.do、*.jsp结尾的请求 -->
 <!--    <filter-mapping>-->
-<!--        <filter-name>LoginFilter</filter-name>-->
+<!--        <filter-name>loginFilter</filter-name>-->
 <!--        <url-pattern>*.do</url-pattern>-->
 <!--    </filter-mapping>-->
 <!--    <filter-mapping>-->
-<!--        <filter-name>LoginFilter</filter-name>-->
+<!--        <filter-name>loginFilter</filter-name>-->
 <!--        <url-pattern>*.jsp</url-pattern>-->
 <!--    </filter-mapping>-->
 
